@@ -24,7 +24,10 @@ jobs:
           
       - name: 安裝依賴套件
         run: |
-          pip install yfinance pandas pandas-ta requests
+          # 確保 pip 升級到最新版本
+          pip install --upgrade pip
+          # 安裝所有必要的函式庫
+          pip install --quiet yfinance pandas pandas-ta requests
           
       - name: 運行每日選股掃描
         # 這裡將 GitHub Secrets 裡的 LINE_TOKEN 傳遞給 Python 程式
