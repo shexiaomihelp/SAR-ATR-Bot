@@ -1,5 +1,4 @@
 name: Daily Trading Bot
-
 on:
   schedule:
     - cron: '0 0 * * *'
