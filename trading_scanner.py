@@ -1,4 +1,4 @@
-# @title 👇 V8.2 最終完整版程式碼 (已修正格式與語法錯誤)
+# @title 👇 V8.2 最終完整版程式碼 (已修正所有格式與語法錯誤)
 import os
 import sys
 import subprocess
@@ -103,11 +103,12 @@ def get_stock_data(ticker, start_date=None, end_date=None):
     except Exception: return None
 
 def get_sp500_tickers():
-    # 這是先前報錯 IndentationError 的區域，已確保縮排正確
+    # 這是修正 Line 62 IndentationError 的區域
     try:
         url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
         return [t.replace('.','-') for t in pd.read_html(url)[0]['Symbol'].tolist()]
-    except: return []
+    except: 
+        return []
 
 # ==========================================
 # 📢 LINE 發送函式
