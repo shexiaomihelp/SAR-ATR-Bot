@@ -6,8 +6,8 @@ on:
 
 jobs:
   run_bot:
-    runs-on: ubuntu-latest
-    env:
+  runs-on: ubuntu-latest
+  env:
       LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
       LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
     steps:
