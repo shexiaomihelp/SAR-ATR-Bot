@@ -1,0 +1,38 @@
+# 檔案路徑: .github/workflows/daily_scan.yml
+
+name: Daily Stock Scan (Mode 1)
+
+on:
+  schedule:
+    # 每天早上 8:30 (UTC+8) 運行
+    - cron: '30 00 * * *'
+  # 允許手動觸發
+  workflow_dispatch: 
+
+jobs:
+  run_daily_scan:
+    # 使用免費的最新版本 Ubuntu 運行器
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 檢查程式碼
+        uses: actions/checkout@v4
+        
+      - name: 設置 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          
+      - name: 安裝所有依賴套件 (加強穩定性)
+        run: |
+          # 確保 pip 升級到最新版本，並安裝所有函式庫
+          pip install --upgrade pip
+          pip install --quiet yfinance pandas pandas-ta requests
+          
+      - name: 運行每日選股掃描
+        # 傳遞密鑰和使用者ID
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
+          LINE_USER_ID: Uc40b972d11b7beec44c946051d87f7e1
+        run: |
+          python trading_scanner.py
