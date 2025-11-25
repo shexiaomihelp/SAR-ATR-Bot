@@ -1,34 +1,29 @@
-name: Daily Trading Scanner
+name: Daily Trading Bot
 
 on:
-  # 每天在指定時間（例如：台北時間早上 8:00，UTC 00:00）執行
   schedule:
-    - cron: '0 0 * * *'
-  # 允許手動觸發
-  workflow_dispatch:
+    - cron: '0 0 * * *' # 每天早上執行
+  workflow_dispatch: # 允許手動按按鈕執行
 
 jobs:
-  run_scanner:
+  run_bot:
     runs-on: ubuntu-latest
-    
-    # 設置環境變數，LINE_ACCESS_TOKEN 和 LINE_USER_ID 必須在 Secrets 中設置
     env:
       LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
       LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-
+    
     steps:
-      - name: 📥 檢出儲存庫
+      - name: 下載程式碼
         uses: actions/checkout@v4
 
-      - name: 🐍 安裝 Python 環境
+      - name: 設定 Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
-      # 這是從 requirements.txt 安裝所有依賴套件的關鍵步驟
-      - name: 📦 安裝依賴項 (requirements.txt)
-        run: pip install -r requirements.txt
+      - name: 安裝套件 (這步最重要)
+        # 這裡會呼叫程式碼裡的安裝功能，因為我們改了程式碼，現在這裡不會報錯了
+        run: python trading_scanner.py install_packages
 
-      - name: 🚀 運行每日掃描 (執行模式 1)
-        # 執行程式，並傳遞參數 '1' 進行每日掃描
+      - name: 執行選股掃描
         run: python trading_scanner.py 1
