@@ -1,10 +1,30 @@
-- name: 📦 安裝必要套件 (強制執行)
-        # 這裡使用 | 符號將多行命令視為一個步驟，確保安裝成功
+name: Daily Trading Bot
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  run_bot:
+    runs-on: ubuntu-latest
+    
+    env:
+      LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
+      LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
         run: |
           pip install yfinance
           pip install pandas
           pip install pandas_ta
           pip install requests lxml html5lib
-          
-      - name: 🚀 執行選股掃描
+
+      - name: Run scanner
         run: python trading_scanner.py 1
