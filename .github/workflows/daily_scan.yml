@@ -2,7 +2,7 @@ name: Daily Trading Bot
 
 on:
   schedule:
-    - cron: '08:30' # 每天早上執行
+    - cron: '0 0 * * *' # 每天早上執行
   workflow_dispatch: # 允許手動按按鈕執行
 
 jobs:
