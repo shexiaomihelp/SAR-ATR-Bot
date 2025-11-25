@@ -19,7 +19,7 @@ jobs:
       - name: 📦 安裝必要套件 (Python 3.11 環境)
         run: |
           python -m pip install --upgrade pip
-          pip install yfinance pandas pandas_ta requests lxml html5lib
+          pip install yfinance pandas pandas-ta requests lxml html5lib
           
       - name: 🚀 執行選股掃描
         run: python trading_scanner.py 1
