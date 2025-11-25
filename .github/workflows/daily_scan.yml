@@ -14,8 +14,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: pip install yfinance pandas pandas_ta requests lxml html5lib
-      - name: Run scanner
+          python-version: '3.11' # **已切換到 3.11**
+      
+      - name: 📦 安裝必要套件 (Python 3.11 環境)
+        run: |
+          python -m pip install --upgrade pip
+          pip install yfinance pandas pandas_ta requests lxml html5lib
+          
+      - name: 🚀 執行選股掃描
         run: python trading_scanner.py 1
