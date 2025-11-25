@@ -24,6 +24,7 @@ def install_packages():
 # 安裝套件檢查與退出邏輯 (GitHub Actions 專用)
 # ==========================================
 if __name__ == "__main__":
+    # 這個區塊專門用於 GitHub Actions 的安裝步驟
     if len(sys.argv) > 1 and sys.argv[1] == 'install_packages':
         install_packages()
         sys.exit(0)
