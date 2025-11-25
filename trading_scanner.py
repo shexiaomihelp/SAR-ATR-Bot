@@ -1,4 +1,4 @@
-# @title 👇 V8.4 最終乾淨版 (只負責交易邏輯)
+# @title 👇 V8.4 最終乾淨版 (請完整貼上這個版本)
 import os
 import sys
 import json
@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
 LINE_USER_ID = os.environ.get("LINE_USER_ID") 
 
-# 股票清單
+# 股票清單 (請確認這是您想要的清單)
 TAIWAN_STOCK_LIST = ['2330.TW', '00878.TW', '00919.TW', '6919.TW', '0050.TW', '2308.TW', '2408.TW', '3293.TW', '6153.TW', '6177.TW', '2454.TW', '2449.TW', '2886.TW', '3260.TW', '6197.TW', '4749.TW', '9958.TW'] 
 BACKTEST_LIST = TAIWAN_STOCK_LIST
 BACKTEST_START_DATE = '2020-01-01'
@@ -31,7 +31,7 @@ CE_MULTIPLIER = 3.0
 MAX_LOSS_PCT = 8.0   
 
 # ==========================================
-# 🔧 功能函式
+# 🔧 功能函式 (請保留此處的英文語法)
 # ==========================================
 def calculate_indicators(df):
     sar_df = ta.psar(df['High'], df['Low'], df['Close'], af=SAR_ACCEL, max_af=SAR_MAX)
@@ -55,9 +55,7 @@ def get_stock_data(ticker):
     except: return None
 
 def send_line_push(msg):
-    if not LINE_ACCESS_TOKEN: 
-        print("LINE Token 未設定，跳過發送")
-        return
+    if not LINE_ACCESS_TOKEN: return
     headers = {"Content-Type": "application/json", "Authorization": "Bearer " + LINE_ACCESS_TOKEN}
     payload = {"to": LINE_USER_ID, "messages": [{"type": "text", "text": msg[:1900]}]}
     try: requests.post("https://api.line.me/v2/bot/message/push", headers=headers, data=json.dumps(payload), timeout=10)
@@ -96,15 +94,13 @@ def backtest(stock_list):
                 stop = max(stop, c['CE_Dynamic'], entry*(1-MAX_LOSS_PCT/100))
                 if c['Close'] < stop:
                     in_pos = False; trades.append((c['Close'] - entry)/entry)
-        
         wins = [t for t in trades if t > 0]
         if trades:
             report += f"{ticker.replace('.TW','')}: {len(trades)}交易 | 勝率 {len(wins)/len(trades):.0%}\n"
     return report
 
 if __name__ == "__main__":
-    try:
-        mode = sys.argv[1] if len(sys.argv) > 1 else '1'
+    try: mode = sys.argv[1] if len(sys.argv) > 1 else '1'
     except: mode = '1'
 
     if mode == '2':
