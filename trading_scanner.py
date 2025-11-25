@@ -299,7 +299,7 @@ def run_scan_or_backtest(mode):
         
         final_msg = full_report
 
-    elif mode == '3':
+   elif mode == '3':
         # Mode 3: 持倉動態停損計算
         try:
             target_ticker = input("請輸入持倉股號代碼 (例如 2330 或 TSLA): ").strip().upper()
@@ -321,7 +321,6 @@ def run_scan_or_backtest(mode):
         
     print(final_msg)
     send_line_push(final_msg)
-
 
 if __name__ == "__main__":
     
