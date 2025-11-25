@@ -315,7 +315,8 @@ def run_scan_or_backtest(mode):
         
         final_msg = calculate_dynamic_stop_loss(target_ticker, entry_price_input, BACKTEST_START_DATE)
         
-    else:inal_msg = "輸入無效。請輸入 1, 2, 或 3。"    print(final_msg)
+    else:inal_msg = "輸入無效。請輸入 1, 2, 或 3。" 
+    print(final_msg)
     send_line_push(final_msg)
 if __name__ == "__main__":
     # 這裡的邏輯已經在程式開頭確保只在需要時執行 install_packages，然後退出。
