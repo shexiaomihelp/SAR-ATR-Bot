@@ -1,48 +1,34 @@
-# .github/workflows/daily_scan.yml
-
-name: Daily Trading Scan
+name: Daily Trading Scanner
 
 on:
+  # 每天在指定時間（例如：台北時間早上 8:00，UTC 00:00）執行
   schedule:
-    # 每天早上 00:00 UTC 執行 (相當於台灣早上 8:00)
-    - cron: '0 0 * * *' 
-  # 允許您手動測試運行
-  workflow_dispatch: 
+    - cron: '0 0 * * *'
+  # 允許手動觸發
+  workflow_dispatch:
 
 jobs:
   run_scanner:
     runs-on: ubuntu-latest
+    
+    # 設置環境變數，LINE_ACCESS_TOKEN 和 LINE_USER_ID 必須在 Secrets 中設置
+    env:
+      LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
+      LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: 📥 檢出儲存庫
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10' # 選擇您的 Python 版本
+      - name: 🐍 安裝 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-    - name: Install dependencies (安裝套件)
-      # 使用您的檔名: trading_scanner.py
-      run: python trading_scanner.py install_packages
+      # 這是從 requirements.txt 安裝所有依賴套件的關鍵步驟
+      - name: 📦 安裝依賴項 (requirements.txt)
+        run: pip install -r requirements.txt
 
-    - name: Run Mode 1 Scan (執行 Mode 1)
-      env:
-        # 自動從 GitHub Secrets 傳入密鑰
-        LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
-        LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-      run: |
-        echo "Running Mode 1 Scan..."
-        # 模擬輸入 1
-        echo "1" | python trading_scanner.py 
-
-    - name: Run Mode 3 Stop-Loss Calc (執行 Mode 3)
-      env:
-        # 自動從 GitHub Secrets 傳入密鑰
-        LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
-        LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-      run: |
-        echo "Running Mode 3 Stop-Loss Calc..."
-        # 模擬輸入 3 (這裡 Mode 3 需要股號和成本，但在排程中會跳過，因為無法輸入)
-        # 實際排程中 Mode 3 僅能成功運行到輸入提示階段，因此通常只排程 Mode 1
-        # 但我們仍保留這個步驟來檢查程式結構
-        echo "3" | python trading_scanner.py
+      - name: 🚀 運行每日掃描 (執行模式 1)
+        # 執行程式，並傳遞參數 '1' 進行每日掃描
+        run: python trading_scanner.py 1
