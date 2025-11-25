@@ -1,38 +1,48 @@
-# 檔案路徑: .github/workflows/daily_scan.yml
+# .github/workflows/daily_scan.yml
 
-name: Daily Stock Scan (Mode 1)
+name: Daily Trading Scan
 
 on:
   schedule:
-    # 每天早上 8:30 (UTC+8) 運行
-    - cron: '30 00 * * *'
-  # 允許手動觸發
+    # 每天早上 00:00 UTC 執行 (相當於台灣早上 8:00)
+    - cron: '0 0 * * *' 
+  # 允許您手動測試運行
   workflow_dispatch: 
 
 jobs:
-  run_daily_scan:
-    # 使用免費的最新版本 Ubuntu 運行器
+  run_scanner:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: 檢查程式碼
-        uses: actions/checkout@v4
-        
-      - name: 設置 Python 環境
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-          
-      - name: 安裝所有依賴套件 (加強穩定性)
-        run: |
-          # 確保 pip 升級到最新版本，並安裝所有函式庫
-          pip install --upgrade pip
-          pip install --quiet yfinance pandas pandas-ta requests
-          
-      - name: 運行每日選股掃描
-        # 傳遞密鑰和使用者ID
-        env:
-          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
-          LINE_USER_ID: Uc40b972d11b7beec44c946051d87f7e1
-        run: |
-          python trading_scanner.py
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' # 選擇您的 Python 版本
+
+    - name: Install dependencies (安裝套件)
+      # 使用您的檔名: trading_scanner.py
+      run: python trading_scanner.py install_packages
+
+    - name: Run Mode 1 Scan (執行 Mode 1)
+      env:
+        # 自動從 GitHub Secrets 傳入密鑰
+        LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
+        LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+      run: |
+        echo "Running Mode 1 Scan..."
+        # 模擬輸入 1
+        echo "1" | python trading_scanner.py 
+
+    - name: Run Mode 3 Stop-Loss Calc (執行 Mode 3)
+      env:
+        # 自動從 GitHub Secrets 傳入密鑰
+        LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
+        LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+      run: |
+        echo "Running Mode 3 Stop-Loss Calc..."
+        # 模擬輸入 3 (這裡 Mode 3 需要股號和成本，但在排程中會跳過，因為無法輸入)
+        # 實際排程中 Mode 3 僅能成功運行到輸入提示階段，因此通常只排程 Mode 1
+        # 但我們仍保留這個步驟來檢查程式結構
+        echo "3" | python trading_scanner.py
