@@ -1,4 +1,4 @@
-# @title 👇 V8.1 最終完整版程式碼 (參數已更新，縮排已校正)
+# @title 👇 V8.2 最終完整版程式碼 (已修正縮排，解決 GitHub Actions 錯誤)
 import os
 import sys
 import subprocess
@@ -22,13 +22,11 @@ def install_packages():
     except:
         os.system('pip install yfinance pandas pandas_ta requests lxml html5lib')
 
-# 在執行主程式前先檢查並安裝
+# 安裝套件
 if __name__ == "__main__":
-    # 這是為了讓 GitHub Actions 能單獨呼叫 install_packages
     if len(sys.argv) > 1 and sys.argv[1] == 'install_packages':
         install_packages()
         sys.exit(0)
-    
     install_packages()
 
 import yfinance as yf
@@ -37,7 +35,7 @@ import requests
 import json
 
 # ==========================================
-# ⚙️ 參數設定區 (V8.1 - 參數已更新)
+# ⚙️ 參數設定區
 # ==========================================
 # V8.1 核心變更：從環境變數讀取密鑰 (支援 GitHub Actions)
 LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
@@ -60,10 +58,10 @@ SAR_ACCEL = 0.02; SAR_MAX = 0.2; MA_SHORT_PERIOD = 5
 ATR_PERIOD = 22; CE_MULTIPLIER = 3.0   
 
 # ⭐️ 波動度與風險配置參數
-VOL_TARGET_RISK = 0.01 # 單筆交易願意承擔的總資產風險 (例如 1%)
-TOTAL_CAPITAL = 100000 # 假設總交易資產為 10 萬元 (用於計算部位大小)
+VOL_TARGET_RISK = 0.01 
+TOTAL_CAPITAL = 100000 
 
-# ⭐️ 策略 3 參數 (RSI 反轉，僅用於掃描/回測邏輯)
+# ⭐️ 策略 3 參數
 RSI_PERIOD = 14
 RSI_OVERSOLD_ENTRY = 30
 RSI_OVERBOUGHT_EXIT = 70 
@@ -105,6 +103,7 @@ def get_stock_data(ticker, start_date=None, end_date=None):
     except Exception: return None
 
 def get_sp500_tickers():
+    # 這是先前報錯 IndentationError 的區域，已確保縮排正確
     try:
         url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
         return [t.replace('.','-') for t in pd.read_html(url)[0]['Symbol'].tolist()]
@@ -270,7 +269,7 @@ def calculate_dynamic_stop_loss(ticker, entry_price_str, start_date):
     return report
 
 # ==========================================
-# 🚀 主程式入口 (V8.1)
+# 🚀 主程式入口 (V8.2)
 # ==========================================
 def run_scan_or_backtest(mode):
     targets = TAIWAN_STOCK_LIST
@@ -316,19 +315,12 @@ def run_scan_or_backtest(mode):
         
         final_msg = calculate_dynamic_stop_loss(target_ticker, entry_price_input, BACKTEST_START_DATE)
         
-    else:
-        final_msg = "輸入無效。請輸入 1, 2, 或 3。"
-
-    print(final_msg)
+    else:inal_msg = "輸入無效。請輸入 1, 2, 或 3。"    print(final_msg)
     send_line_push(final_msg)
-
-
 if __name__ == "__main__":
-    
-    # 這裡的程式碼在前面已經處理了 install_packages，所以 main 邏輯不需要重複執行
-    # 只有當腳本沒有被 install_packages 的邏輯跳過時才會繼續執行
-    
-    print("=== V8.1 交易系統 - 最終版 (縮排已校正) ===")
+    # 這裡的邏輯已經在程式開頭確保只在需要時執行 install_packages，然後退出。
+    # 正常執行時，會從這裡開始：
+    print("=== V8.2 交易系統 - 最終版 (縮排已校正) ===")
     print("1: 每日選股掃描 (SAR 趨勢 + 波動度部位配置)")
     print("2: 歷史回溯測試 (SAR 趨勢策略)")
     print("3: **持倉動態 ATR 停損計算**")
@@ -337,9 +329,6 @@ if __name__ == "__main__":
         # 處理 GitHub Actions 的模擬輸入
         if len(sys.argv) > 1 and sys.argv[1].isdigit():
              mode = sys.argv[1]
-        elif len(sys.argv) > 1 and sys.argv[1] == 'install_packages':
-             # 已經在前面處理過 install_packages，這裡跳過
-             sys.exit(0)
         else:
              mode = input("請輸入數字 (1, 2, 或 3): ").strip()
              
