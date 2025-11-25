@@ -14,12 +14,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # 切換回 3.10
+          python-version: '3.10' # 切回 3.10，使用最穩定的環境
       
-      - name: Instal dependencies
+      - name: Install dependencies
         run: |
-          # 嘗試標準安裝，避免 git clone 錯誤
-          pip install yfinance pandas pandas-ta requests lxml html5lib
+          # 移除 pandas-ta 和 git 的依賴
+          pip install yfinance pandas requests lxml html5lib
           
       - name: Run scanner
         run: python trading_scanner.py 1
