@@ -130,3 +130,31 @@ if __name__ == "__main__":
     
     print(msg)
     send_line_push(msg)
+def send_line_push(msg):
+    LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
+    LINE_USER_ID = os.environ.get("LINE_USER_ID")
+    
+    if not LINE_ACCESS_TOKEN or not LINE_USER_ID:
+        print("WARNING: LINE_ACCESS_TOKEN or LINE_USER_ID is missing from environment variables.")
+        return
+        
+    headers = {"Content-Type": "application/json", "Authorization": "Bearer " + LINE_ACCESS_TOKEN}
+    payload = {"to": LINE_USER_ID, "messages": [{"type": "text", "text": msg[:1900]}]}
+    
+    print(f"Attempting to send LINE message to user ID: {LINE_USER_ID}") 
+    
+    try: 
+        response = requests.post("https://api.line.me/v2/bot/message/push", 
+                                 headers=headers, 
+                                 data=json.dumps(payload), 
+                                 timeout=10)
+        
+        print(f"LINE API Response Status Code: {response.status_code}")
+        
+        if response.status_code != 200:
+            print(f"LINE API Push FAILED. Response: {response.text}")
+            
+    except requests.exceptions.RequestException as e:
+        print(f"LINE Push Network Error: {e}")
+    except Exception as e:
+        print(f"LINE Push Unexpected Error: {e}")
