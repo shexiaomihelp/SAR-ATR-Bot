@@ -315,8 +315,8 @@ def run_scan_or_backtest(mode):
         
         final_msg = calculate_dynamic_stop_loss(target_ticker, entry_price_input, BACKTEST_START_DATE)
               
-        else:
-            final_msg = "輸入無效。請輸入 1, 2, 或 3。"
+        else: 
+        final_msg = "輸入無效。請輸入 1, 2, 或 3。"
         print(final_msg)
         send_line_push(final_msg)
 
