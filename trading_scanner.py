@@ -1,4 +1,4 @@
-# @title 👇 V8.2 最終完整版程式碼 (已修正縮排，解決 GitHub Actions 錯誤)
+# @title 👇 V8.2 最終完整版程式碼 (已修正格式與語法錯誤)
 import os
 import sys
 import subprocess
@@ -269,7 +269,7 @@ def calculate_dynamic_stop_loss(ticker, entry_price_str, start_date):
     return report
 
 # ==========================================
-# 🚀 主程式入口 (V8.2)
+# 🚀 主程式入口 (V8.2 - 語法已修正)
 # ==========================================
 def run_scan_or_backtest(mode):
     targets = TAIWAN_STOCK_LIST
@@ -315,13 +315,20 @@ def run_scan_or_backtest(mode):
         
         final_msg = calculate_dynamic_stop_loss(target_ticker, entry_price_input, BACKTEST_START_DATE)
         
-    else:inal_msg = "輸入無效。請輸入 1, 2, 或 3。" 
+    else: # 這是修正後的 else 區塊
+        final_msg = "輸入無效。請輸入 1, 2, 或 3。" # 確保語法正確
+        
+    # 這些語句必須與 if/elif/else 保持相同的縮排級別 (即在 run_scan_or_backtest 函式內)
     print(final_msg)
     send_line_push(final_msg)
+
+
 if __name__ == "__main__":
+    
     # 這裡的邏輯已經在程式開頭確保只在需要時執行 install_packages，然後退出。
     # 正常執行時，會從這裡開始：
-    print("=== V8.2 交易系統 - 最終版 (縮排已校正) ===")
+    
+    print("=== V8.2 交易系統 - 最終版 (縮排與語法已校正) ===")
     print("1: 每日選股掃描 (SAR 趨勢 + 波動度部位配置)")
     print("2: 歷史回溯測試 (SAR 趨勢策略)")
     print("3: **持倉動態 ATR 停損計算**")
