@@ -318,7 +318,6 @@ def run_scan_or_backtest(mode):
     else: 
         final_msg = "輸入無效。請輸入 1, 2, 或 3。"
         
-    # 以下兩行是所有模式結束後，都要執行的動作，所以必須與 if/elif/else 保持同一縮排
     print(final_msg)
     send_line_push(final_msg)
 
