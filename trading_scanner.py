@@ -1,33 +1,23 @@
-# @title 👇 最終整合版程式碼 (V5.1 邏輯 + 健壯結構)
-import os
-import sys
-import subprocess
-# 僅導入內建或不依賴 pip 安裝的套件
-from datetime import datetime, timedelta
-
-# ==========================================
-# 0. 環境設置與套件安裝
-# ==========================================
+# ... (安裝函式定義)
 def install_packages():
-    required = {'yfinance', 'pandas', 'pandas_ta', 'requests', 'lxml', 'html5lib'}
-    try:
-        import pkg_resources
-        installed = {pkg.key for pkg in pkg_resources.working_set}
-        missing = required - installed
-        if missing:
-            print(f"正在安裝缺少的套件: {missing}")
-            subprocess.check_call([sys.executable, '-m', 'pip', 'install', *missing])
-    except:
-        os.system('pip install yfinance pandas pandas_ta requests lxml html5lib')
+    # ...
 
 # ==========================================
 # 安裝套件檢查與退出邏輯 (GitHub Actions 專用)
 # ==========================================
 if __name__ == "__main__":
-    # 這個區塊專門用於 GitHub Actions 的安裝步驟
     if len(sys.argv) > 1 and sys.argv[1] == 'install_packages':
         install_packages()
-        sys.exit(0)
+        sys.exit(0) # <--- 如果執行到這裡，程式就應該退出
+
+# ==========================================
+# 導入已安裝的套件 (確保在安裝邏輯之後才執行)
+# ==========================================
+import time 
+import pandas as pd  # <--- 必須在這裡 (靠後的位置)
+import numpy as np
+import yfinance as yf
+# ...
 
 # ==========================================
 # 導入已安裝的套件 (確保在安裝邏輯之後才執行)
