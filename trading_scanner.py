@@ -1,10 +1,8 @@
-# @title 👇 V5.1 最終版程式碼 (已更新 LINE Token & 修正停損報表)
+# @title 👇 最終整合版程式碼 (V5.1 邏輯 + 健壯結構)
 import os
 import sys
 import subprocess
-import time
-import pandas as pd
-import numpy as np
+# 僅導入內建或不依賴 pip 安裝的套件
 from datetime import datetime, timedelta
 
 # ==========================================
@@ -22,26 +20,44 @@ def install_packages():
     except:
         os.system('pip install yfinance pandas pandas_ta requests lxml html5lib')
 
-# 執行安裝檢查
-install_packages()
+# ==========================================
+# 安裝套件檢查與退出邏輯 (GitHub Actions 專用)
+# ==========================================
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == 'install_packages':
+        install_packages()
+        sys.exit(0)
 
+# ==========================================
+# 導入已安裝的套件 (確保在安裝邏輯之後才執行)
+# ==========================================
+import time # 內建套件
+import pandas as pd
+import numpy as np
 import yfinance as yf
 import pandas_ta as ta
 import requests
 import json
 
 # ==========================================
-# ⚙️ 參數設定區
+# ⚙️ 參數設定區 (採用 V5.1 參數)
 # ==========================================
-# 🚨 LINE Token (已更新為您的最新路徑並移除空格)
-LINE_ACCESS_TOKEN = "3PHDoe5Vr3TAM5aJymB5usA1Yooo8e0H4U94CUdXlcWtCGbR+lmXRxtPWd6TNqu0iIHpsEgqyrqOul8JTX0mTakbPv2IlkdGinnOxnK2bvFkm+BHWQikfzu6GUjVvfxc2GRgKzxJfoFmuvlhMrrBeAdB04t89/1O/w1cDnyilFU="
-LINE_USER_ID = "Uc40b972d11b7beec44c946051d87f7e1" # 您的 LINE User ID (假設不變)
+# V8.2 安全修正：從環境變數讀取密鑰 (請在 GitHub Secrets 中設置)
+LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
+LINE_USER_ID = os.environ.get("LINE_USER_ID") 
 
-# 🇹🇼 台股清單
-TAIWAN_STOCK_LIST = ['2330.TW', '00878.TW', '00919.TW', '6919.TW', '0050.TW', '2308.TW', '2408.TW', '3293.TW', '6153.TW', '6177.TW', '2454.TW', '2449.TW', '2886.TW', '3260.TW', '6197.TW', '4749.TW', '9958.TW']
+if not LINE_ACCESS_TOKEN:
+    print("警告：LINE 密鑰未設定或讀取失敗，發送功能將被跳過。")
+    LINE_ACCESS_TOKEN = "DEBUG_TOKEN" 
+
+# ------------------------------------------
+# ⭐️ 您的最新清單與回測日期 ⭐️
+# ------------------------------------------
+TAIWAN_STOCK_LIST = ['2330.TW', '00878.TW', '00919.TW', '6919.TW', '0050.TW', '2308.TW', '2408.TW', '3293.TW', '6153.TW', '6177.TW', '2454.TW', '2449.TW', '2886.TW', '3260.TW', '6197.TW', '4749.TW', '9958.TW'] 
 BACKTEST_LIST = TAIWAN_STOCK_LIST
 BACKTEST_START_DATE = '2020-01-01'
 BACKTEST_END_DATE = '2025-11-01'
+# ------------------------------------------
 
 # 🚀 1. 進場參數
 SAR_ACCEL = 0.02
@@ -49,12 +65,12 @@ SAR_MAX = 0.2
 MA_SHORT_PERIOD = 5  # 必須站上 MA5
 
 # 🛡️ 2. 出場與風控參數
-ATR_PERIOD = 22       
-CE_MULTIPLIER = 3.0   # 吊燈距離 (3倍 ATR，防洗盤用)
-MAX_LOSS_PCT = 8.0    # 強制停損底線 (最大虧損不超過 8%)
+ATR_PERIOD = 22      
+CE_MULTIPLIER = 3.0  # 吊燈距離 (3倍 ATR，防洗盤用)
+MAX_LOSS_PCT = 8.0   # 強制停損底線 (最大虧損不超過 8%)
 
 # ==========================================
-# 🔧 指標計算核心 (手寫版 - 避免套件錯誤)
+# 🔧 指標計算核心 (採用 V5.1 邏輯)
 # ==========================================
 def calculate_indicators(df):
     """計算 V5.1 所需指標，包含手寫的 Chandelier Exit"""
@@ -96,9 +112,13 @@ def get_stock_data(ticker, start_date=None, end_date=None):
         return None
 
 # ==========================================
-# 📢 LINE 發送函式
+# 📢 LINE 發送函式 (採用 V8.2 安全邏輯)
 # ==========================================
 def send_line_push(msg):
+    if LINE_ACCESS_TOKEN == "DEBUG_TOKEN":
+        print("LINE 訊息未發送 (密鑰未設定或讀取失敗)")
+        return
+        
     url = "https://api.line.me/v2/bot/message/push"
     headers = {"Content-Type": "application/json", "Authorization": "Bearer " + LINE_ACCESS_TOKEN}
     if len(msg) > 1900: msg = msg[:1900] + "\n...(訊息過長截斷)"
@@ -141,7 +161,7 @@ def backtest_strategy(ticker, df):
             # 確保停損線只會往上推，不會低於硬性停損底線
             new_stop = max(current_stop_price, ce_dynamic, hard_stop)
             current_stop_price = new_stop
-                
+            
             # 2. 檢查是否觸發出場
             if price < current_stop_price:
                 profit_loss = (price - entry_price) / entry_price
@@ -191,7 +211,7 @@ def format_report(ticker, trades):
             f"----------------\n")
 
 # ==========================================
-# 🔍 每日掃描邏輯 (修正初始停損計算)
+# 🔍 每日掃描邏輯 (採用 V5.1 邏輯)
 # ==========================================
 def get_sp500_tickers():
     try:
@@ -225,7 +245,6 @@ def scan_market(stock_list):
             sar_stop = curr['SAR']
             
             # 3. 最終建議停損：取兩個安全線中較高者 (即離現價最近的風險底線)
-            #    這修正了 CE_Dynamic 過高導致停損高於現價的問題
             final_stop = max(hard_stop, sar_stop) 
             
             # 確保計算後的數字顯示是負數
@@ -247,14 +266,23 @@ def scan_market(stock_list):
 # 🚀 主程式入口
 # ==========================================
 if __name__ == "__main__":
+    
+    # 這裡的邏輯已經在程式開頭確保只在需要時執行 install_packages，然後退出。
+    
     print(f"=== V5.1 交易系統 (SAR/MA5 + 吊燈 + {MAX_LOSS_PCT}%強制風控) ===")
     print("1. 每日選股掃描 (台股 + 美股)")
     print("2. 歷史回溯測試 (BACKTEST_LIST)")
     
     try:
-        mode = input("請輸入數字 (1 或 2): ")
-    except: mode = '1'
-    
+        # 處理 GitHub Actions 的模擬輸入
+        if len(sys.argv) > 1 and sys.argv[1].isdigit():
+             mode = sys.argv[1]
+        else:
+             mode = input("請輸入數字 (1 或 2): ").strip()
+             
+    except: 
+        mode = '1'
+        
     if mode == '2':
         # 回測模式
         full_report = f"📊 V5.1 回測報告 ({BACKTEST_START_DATE}~{BACKTEST_END_DATE})\n"
