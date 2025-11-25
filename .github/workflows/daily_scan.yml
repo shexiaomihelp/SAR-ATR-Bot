@@ -7,23 +7,15 @@ on:
 jobs:
   run_bot:
     runs-on: ubuntu-latest
-    
     env:
       LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
       LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
-    
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
       - name: Install dependencies
-        run: |
-          pip install yfinance
-          pip install pandas
-          pip install pandas_ta
-          pip install requests lxml html5lib
-
+        run: pip install yfinance pandas pandas_ta requests lxml html5lib
       - name: Run scanner
         run: python trading_scanner.py 1
