@@ -3,7 +3,7 @@ name: Daily Trading Bot
 on:
   schedule:
     - cron: '0 0 * * *' # 每天早上執行
-  workflow_dispatch: # 允許手動按按鈕執行
+  workflow_dispatch: # 允許手動執行
 
 jobs:
   run_bot:
@@ -13,17 +13,17 @@ jobs:
       LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
     
     steps:
-      - name: 下載程式碼
+      - name: 📥 下載程式碼
         uses: actions/checkout@v4
 
-      - name: 設定 Python
+      - name: 🐍 設定 Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: 安裝套件 (這步最重要)
-        # 這裡會呼叫程式碼裡的安裝功能，因為我們改了程式碼，現在這裡不會報錯了
-        run: python trading_scanner.py install_packages
+      - name: 📦 安裝必要套件 (直接安裝)
+        # 這行會幫您把 yfinance, pandas 裝好，程式就不會報錯了
+        run: pip install yfinance pandas pandas_ta requests lxml html5lib
 
-      - name: 執行選股掃描
+      - name: 🚀 執行選股掃描
         run: python trading_scanner.py 1
