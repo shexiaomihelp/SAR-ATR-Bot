@@ -3,10 +3,10 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
-  
+
 jobs:
   run_bot:
-    runs-on:ubuntu-latest
+    runs-on: ubuntu-latest
     env:
       LINE_ACCESS_TOKEN: ${{ secrets.LINE_ACCESS_TOKEN }}
       LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
@@ -19,7 +19,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install git+https://github.com/twopirllc/pandas-ta.git
+          pip install 
+https://github.com/twopirllc/pandas-ta.git
           pip install yfinance pandas requests lxml html5lib
           
       - name: Run scanner
