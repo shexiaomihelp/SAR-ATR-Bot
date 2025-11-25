@@ -314,11 +314,13 @@ def run_scan_or_backtest(mode):
         except Exception as e: return f"輸入失敗: {e}"
         
         final_msg = calculate_dynamic_stop_loss(target_ticker, entry_price_input, BACKTEST_START_DATE)
-              
-        else: 
-            final_msg = "輸入無效。請輸入 1, 2, 或 3。"
-        print(final_msg)
-        send_line_push(final_msg)
+        
+    else: 
+        final_msg = "輸入無效。請輸入 1, 2, 或 3。"
+        
+    # 以下兩行是所有模式結束後，都要執行的動作，所以必須與 if/elif/else 保持同一縮排
+    print(final_msg)
+    send_line_push(final_msg)
 
 
 if __name__ == "__main__":
